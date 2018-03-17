@@ -8,7 +8,7 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import { GraphQLSchema, isType } from 'graphql';
+import { GraphQLSchema, isType, GraphQLNonNull } from 'graphql';
 
 import FieldDoc from './DocExplorer/FieldDoc';
 import SchemaDoc from './DocExplorer/SchemaDoc';
@@ -40,6 +40,7 @@ const initialNav = {
 export class DocExplorer extends React.Component {
   static propTypes = {
     schema: PropTypes.instanceOf(GraphQLSchema),
+    onGenerateQuery: PropTypes.n,
   };
 
   constructor() {
@@ -82,29 +83,26 @@ export class DocExplorer extends React.Component {
           searchValue={navItem.search}
           withinType={navItem.def}
           schema={schema}
-          onClickType={this.handleClickTypeOrField}
-          onClickField={this.handleClickTypeOrField}
+          onClickType={this.handleClickType}
+          onClickField={this.handleClickField}
         />
       );
     } else if (navStack.length === 1) {
       content = (
-        <SchemaDoc schema={schema} onClickType={this.handleClickTypeOrField} />
+        <SchemaDoc schema={schema} onClickType={this.handleClickType} />
       );
     } else if (isType(navItem.def)) {
       content = (
         <TypeDoc
           schema={schema}
           type={navItem.def}
-          onClickType={this.handleClickTypeOrField}
-          onClickField={this.handleClickTypeOrField}
+          onClickType={this.handleClickType}
+          onClickField={this.handleClickField}
         />
       );
     } else {
       content = (
-        <FieldDoc
-          field={navItem.def}
-          onClickType={this.handleClickTypeOrField}
-        />
+        <FieldDoc field={navItem.def} onClickType={this.handleClickType} />
       );
     }
 
@@ -146,7 +144,7 @@ export class DocExplorer extends React.Component {
   }
 
   // Public API
-  showDoc(typeOrField) {
+  showDoc(typeOrField, field) {
     const navStack = this.state.navStack;
     const topNav = navStack[navStack.length - 1];
     if (topNav.def !== typeOrField) {
@@ -155,6 +153,7 @@ export class DocExplorer extends React.Component {
           {
             name: typeOrField.name,
             def: typeOrField,
+            field,
           },
         ]),
       });
@@ -192,8 +191,53 @@ export class DocExplorer extends React.Component {
     }
   };
 
-  handleClickTypeOrField = typeOrField => {
-    this.showDoc(typeOrField);
+  handleClickType = (type, relatedField) => {
+    console.log('click type', relatedField);
+    this.showDoc(type, relatedField);
+  };
+
+  handleClickField = (field, event) => {
+    if (event.shiftKey || event.ctrlKey || event.metaKey) {
+      this.generateQuery(field);
+    } else {
+      this.showDoc(field, field);
+    }
+  };
+
+  generateQuery = field => {
+    let str = '%s';
+
+    // this doesn't work inside a search
+    if (this.state.navStack.find(({ search }) => search)) {
+      return;
+    }
+
+    this.state.navStack.forEach(nav => {
+      if (nav.field) {
+        str = str.replace(
+          '%s',
+          `${nav.field.name ? nav.field.name : nav.field}{%s}`,
+        );
+      }
+    });
+
+    if (str) {
+      const args = field.args.filter(arg => arg.type instanceof GraphQLNonNull);
+
+      if (args.length) {
+        const stringArgs = args
+          .map(arg => {
+            return `${arg.name}: null`;
+          })
+          .join(',');
+
+        str = str.replace('%s', `${field.name}(${stringArgs})`);
+      } else {
+        str = str.replace('%s', `${field.name}`);
+      }
+
+      this.props.onGenerateQuery(str);
+    }
   };
 
   handleSearch = value => {

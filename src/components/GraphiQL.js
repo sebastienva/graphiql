@@ -388,6 +388,13 @@ export class GraphiQL extends React.Component {
             ref={c => {
               this.docExplorerComponent = c;
             }}
+            onGenerateQuery={query => {
+              this.setState({ query }, () => {
+                this.setState({ query: this.autoCompleteLeafs() }, () => {
+                  this.handlePrettifyQuery();
+                });
+              });
+            }}
             schema={this.state.schema}>
             <div className="docExplorerHide" onClick={this.handleToggleDocs}>
               {'\u2715'}
