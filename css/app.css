@@ -1,9 +1,6 @@
-.graphiql-container,
-.graphiql-container button,
-.graphiql-container input {
+.graphiql-container, .graphiql-container button, .graphiql-container input {
   color: #141823;
-  font-family:
-    system,
+  font-family: system,
     -apple-system,
     'San Francisco',
     '.SFNSDisplay-Regular',
@@ -67,8 +64,7 @@
   display: flex;
 }
 
-.graphiql-container .docExplorerShow,
-.graphiql-container .historyShow {
+.graphiql-container .docExplorerShow, .graphiql-container .historyShow {
   background: linear-gradient(#f7f7f7, #e2e2e2);
   border-radius: 0;
   border-bottom: 1px solid #d0d0d0;
@@ -123,8 +119,7 @@
   position: relative;
 }
 
-.graphiql-container .docExplorerWrap,
-.graphiql-container .historyPaneWrap {
+.graphiql-container .docExplorerWrap, .graphiql-container .historyPaneWrap {
   background: white;
   box-shadow: 0 0 8px rgba(0, 0, 0, 0.15);
   position: relative;
@@ -230,9 +225,8 @@
   background: #fdfdfd;
   background: linear-gradient(#f9f9f9, #ececec);
   border-radius: 3px;
-  box-shadow:
-    inset 0 0 0 1px rgba(0,0,0,0.20),
-    0 1px 0 rgba(255,255,255, 0.7),
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.20),
+    0 1px 0 rgba(255, 255, 255, 0.7),
     inset 0 1px #fff;
   color: #555;
   cursor: pointer;
@@ -247,9 +241,8 @@
 
 .graphiql-container .toolbar-button:active {
   background: linear-gradient(#ececec, #d5d5d5);
-  box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.7),
-    inset 0 0 0 1px rgba(0,0,0,0.10),
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.7),
+    inset 0 0 0 1px rgba(0, 0, 0, 0.10),
     inset 0 1px 1px 1px rgba(0, 0, 0, 0.12),
     inset 0 0 5px rgba(0, 0, 0, 0.1);
 }
@@ -288,7 +281,7 @@
 .graphiql-container .execute-button {
   background: linear-gradient(#fdfdfd, #d2d3d6);
   border-radius: 17px;
-  border: 1px solid rgba(0,0,0,0.25);
+  border: 1px solid rgba(0, 0, 0, 0.25);
   box-shadow: 0 1px 0 #fff;
   cursor: pointer;
   fill: #444;
@@ -304,8 +297,7 @@
 
 .graphiql-container .execute-button:active {
   background: linear-gradient(#e6e6e6, #c3c3c3);
-  box-shadow:
-    0 1px 0 #fff,
+  box-shadow: 0 1px 0 #fff,
     inset 0 0 2px rgba(0, 0, 0, 0.2),
     inset 0 0 6px rgba(0, 0, 0, 0.1);
 }
@@ -314,8 +306,7 @@
   outline: 0;
 }
 
-.graphiql-container .toolbar-menu,
-.graphiql-container .toolbar-select {
+.graphiql-container .toolbar-menu, .graphiql-container .toolbar-select {
   position: relative;
 }
 
@@ -323,9 +314,7 @@
 .graphiql-container .toolbar-menu-items,
 .graphiql-container .toolbar-select-options {
   background: #fff;
-  box-shadow:
-    0 0 0 1px rgba(0,0,0,0.1),
-    0 2px 4px rgba(0,0,0,0.25);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.25);
   margin: 0;
   padding: 6px 0;
   position: absolute;
@@ -407,8 +396,7 @@
 
 .graphiql-container .CodeMirror {
   color: #141823;
-  font-family:
-    'Consolas',
+  font-family: 'Consolas',
     'Inconsolata',
     'Droid Sans Mono',
     'Monaco',
@@ -429,7 +417,18 @@
   box-orient: vertical;
   color: #141823;
   display: flex;
-  font-family: system, -apple-system, 'San Francisco', '.SFNSDisplay-Regular', 'Segoe UI', Segoe, 'Segoe WP', 'Helvetica Neue', helvetica, 'Lucida Grande', arial, sans-serif;
+  font-family: system,
+    -apple-system,
+    'San Francisco',
+    '.SFNSDisplay-Regular',
+    'Segoe UI',
+    Segoe,
+    'Segoe WP',
+    'Helvetica Neue',
+    helvetica,
+    'Lucida Grande',
+    arial,
+    sans-serif;
   font-size: 13px;
   line-clamp: 3;
   line-height: 16px;
@@ -480,8 +479,7 @@ div.CodeMirror-lint-tooltip {
   border: 0;
   color: #141823;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
-  font-family:
-    system,
+  font-family: system,
     -apple-system,
     'San Francisco',
     '.SFNSDisplay-Regular',
@@ -516,9 +514,7 @@ div.CodeMirror-lint-tooltip > * + * {
   border-radius: 4px;
   background: #08f;
   background: linear-gradient(#43A8FF, #0F83E8);
-  box-shadow:
-    0 1px 1px rgba(0, 0, 0, 0.2),
-    inset 0 0 0 1px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2), inset 0 0 0 1px rgba(0, 0, 0, 0.1);
   color: white;
   font-family: arial;
   font-size: 12px;
@@ -605,4 +601,27 @@ div.CodeMirror-lint-tooltip > * + * {
 /* Type */
 .cm-atom {
   color: #CA9800;
+}
+
+.test-button {
+  float: right;
+}
+
+.test-button {
+  background-color: #e7e7e7;
+  color: black;
+  border: none;
+  float: right;
+  border-radius: 4px;
+  outline: none;
+  border: 1px solid transparent;
+  cursor: pointer;
+}
+
+.test-button:hover {
+  border: 1px solid #cccccc;
+}
+
+.test-button:active {
+  background-color: #cccccc;
 }

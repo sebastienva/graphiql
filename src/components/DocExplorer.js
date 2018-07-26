@@ -98,6 +98,7 @@ export class DocExplorer extends React.Component {
           type={navItem.def}
           onClickType={this.handleClickType}
           onClickField={this.handleClickField}
+          onClickTest={this.handleClickTest}
         />
       );
     } else {
@@ -192,16 +193,15 @@ export class DocExplorer extends React.Component {
   };
 
   handleClickType = (type, relatedField) => {
-    console.log('click type', relatedField);
     this.showDoc(type, relatedField);
   };
 
-  handleClickField = (field, event) => {
-    if (event.shiftKey || event.ctrlKey || event.metaKey) {
-      this.generateQuery(field);
-    } else {
-      this.showDoc(field, field);
-    }
+  handleClickField = field => {
+    this.showDoc(field, field);
+  };
+
+  handleClickTest = field => {
+    this.generateQuery(field);
   };
 
   generateQuery = field => {

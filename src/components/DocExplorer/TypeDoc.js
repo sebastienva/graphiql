@@ -47,6 +47,7 @@ export default class TypeDoc extends React.Component {
     const type = this.props.type;
     const onClickType = this.props.onClickType;
     const onClickField = this.props.onClickField;
+    const onClickTest = this.props.onClickTest;
 
     let typesTitle;
     let types;
@@ -93,6 +94,7 @@ export default class TypeDoc extends React.Component {
                 field={field}
                 onClickType={onClickType}
                 onClickField={onClickField}
+                onClickTest={onClickTest}
               />,
             )}
         </div>
@@ -116,6 +118,7 @@ export default class TypeDoc extends React.Component {
                     field={field}
                     onClickType={onClickType}
                     onClickField={onClickField}
+                    onClickTest={onClickTest}
                   />,
                 )}
           </div>
@@ -174,7 +177,7 @@ export default class TypeDoc extends React.Component {
   handleShowDeprecated = () => this.setState({ showDeprecated: true });
 }
 
-function Field({ type, field, onClickType, onClickField }) {
+function Field({ type, field, onClickType, onClickField, onClickTest }) {
   return (
     <div className="doc-category-item">
       <a className="field-name" onClick={event => onClickField(field, event)}>
@@ -192,7 +195,14 @@ function Field({ type, field, onClickType, onClickField }) {
       ]}
       {': '}
       <TypeLink field={field} type={field.type} onClick={onClickType} />
-      {' '}
+
+      <button
+        className="test-button"
+        title="Try it out"
+        onClick={event => onClickTest(field)}>
+        {'{...}'}
+      </button>
+
       <DefaultValue field={field} />
       {field.description &&
         <MarkdownContent
