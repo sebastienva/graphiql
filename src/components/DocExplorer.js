@@ -40,7 +40,7 @@ const initialNav = {
 export class DocExplorer extends React.Component {
   static propTypes = {
     schema: PropTypes.instanceOf(GraphQLSchema),
-    onGenerateQuery: PropTypes.n,
+    onGenerateQuery: PropTypes.func,
   };
 
   constructor() {

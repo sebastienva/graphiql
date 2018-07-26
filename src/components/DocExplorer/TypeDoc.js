@@ -38,7 +38,8 @@ export default class TypeDoc extends React.Component {
     return (
       this.props.type !== nextProps.type ||
       this.props.schema !== nextProps.schema ||
-      this.state.showDeprecated !== nextState.showDeprecated
+      this.state.showDeprecated !== nextState.showDeprecated ||
+      this.state.hover !== nextState.hover
     );
   }
 
@@ -85,18 +86,22 @@ export default class TypeDoc extends React.Component {
       fieldsDef = (
         <div className="doc-category">
           <div className="doc-category-title">{'fields'}</div>
-          {fields
-            .filter(field => !field.isDeprecated)
-            .map(field =>
+          {fields.filter(field => !field.isDeprecated).map(field =>
+            <div
+              key={field.name}
+              onMouseOver={() => {
+                this.setState({ hover: field.name });
+              }}>
               <Field
-                key={field.name}
                 type={type}
                 field={field}
                 onClickType={onClickType}
                 onClickField={onClickField}
                 onClickTest={onClickTest}
-              />,
-            )}
+                hover={this.state.hover === field.name}
+              />
+            </div>,
+          )}
         </div>
       );
 
@@ -177,7 +182,7 @@ export default class TypeDoc extends React.Component {
   handleShowDeprecated = () => this.setState({ showDeprecated: true });
 }
 
-function Field({ type, field, onClickType, onClickField, onClickTest }) {
+function Field({ type, field, onClickType, onClickField, onClickTest, hover }) {
   return (
     <div className="doc-category-item">
       <a className="field-name" onClick={event => onClickField(field, event)}>
@@ -196,12 +201,13 @@ function Field({ type, field, onClickType, onClickField, onClickTest }) {
       {': '}
       <TypeLink field={field} type={field.type} onClick={onClickType} />
 
-      <button
-        className="test-button"
-        title="Try it out"
-        onClick={event => onClickTest(field)}>
-        {'{...}'}
-      </button>
+      {hover &&
+        <button
+          className="test-button"
+          title="Try it out"
+          onClick={() => onClickTest(field)}>
+          {'{...}'}
+        </button>}
 
       <DefaultValue field={field} />
       {field.description &&

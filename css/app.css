@@ -611,7 +611,8 @@ div.CodeMirror-lint-tooltip > * + * {
   background-color: #e7e7e7;
   color: black;
   border: none;
-  float: right;
+  position: absolute;
+  right: 4px;
   border-radius: 4px;
   outline: none;
   border: 1px solid transparent;
