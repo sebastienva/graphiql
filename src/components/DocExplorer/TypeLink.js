@@ -21,11 +21,16 @@ export default class TypeLink extends React.Component {
   }
 
   render() {
-    return renderType(this.props.type, this.props.onClick, this.props.field);
+    return renderType(
+      this.props.type,
+      this.props.onClick,
+      this.props.field,
+      this.props.arg,
+    );
   }
 }
 
-function renderType(type, onClick, field) {
+function renderType(type, onClick, field, arg) {
   if (type instanceof GraphQLNonNull) {
     return <span>{renderType(type.ofType, onClick)}{'!'}</span>;
   }
@@ -33,7 +38,9 @@ function renderType(type, onClick, field) {
     return <span>{'['}{renderType(type.ofType, onClick)}{']'}</span>;
   }
   return (
-    <a className="type-name" onClick={event => onClick(type, field, event)}>
+    <a
+      className="type-name"
+      onClick={event => onClick(type, field, event, arg)}>
       {type.name}
     </a>
   );

@@ -193,7 +193,12 @@ function Field({ type, field, onClickType, onClickField, onClickTest, hover }) {
         '(',
         <span key="args">
           {field.args.map(arg =>
-            <Argument key={arg.name} arg={arg} onClickType={onClickType} />,
+            <Argument
+              field={field}
+              key={arg.name}
+              arg={arg}
+              onClickType={onClickType}
+            />,
           )}
         </span>,
         ')',

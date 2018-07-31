@@ -8,7 +8,7 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import { GraphQLSchema, isType, GraphQLNonNull } from 'graphql';
+import { GraphQLSchema, isType, GraphQLNonNull, print } from 'graphql';
 
 import FieldDoc from './DocExplorer/FieldDoc';
 import SchemaDoc from './DocExplorer/SchemaDoc';
@@ -47,6 +47,7 @@ export class DocExplorer extends React.Component {
     super();
 
     this.state = { navStack: [initialNav] };
+    this.currentFields = [];
   }
 
   shouldComponentUpdate(nextProps, nextState) {
@@ -145,7 +146,8 @@ export class DocExplorer extends React.Component {
   }
 
   // Public API
-  showDoc(typeOrField, field) {
+  showDoc(typeOrField, field, arg) {
+    this.currentFields = [];
     const navStack = this.state.navStack;
     const topNav = navStack[navStack.length - 1];
     if (topNav.def !== typeOrField) {
@@ -155,6 +157,7 @@ export class DocExplorer extends React.Component {
             name: typeOrField.name,
             def: typeOrField,
             field,
+            arg,
           },
         ]),
       });
@@ -192,8 +195,8 @@ export class DocExplorer extends React.Component {
     }
   };
 
-  handleClickType = (type, relatedField) => {
-    this.showDoc(type, relatedField);
+  handleClickType = (type, relatedField, event, arg) => {
+    this.showDoc(type, relatedField, arg);
   };
 
   handleClickField = field => {
@@ -204,40 +207,147 @@ export class DocExplorer extends React.Component {
     this.generateQuery(field);
   };
 
-  generateQuery = field => {
-    let str = '%s';
+  buildDocument(definitions) {
+    return {
+      kind: 'Document',
+      definitions,
+    };
+  }
 
+  buildOperationDefinition(options) {
+    return {
+      kind: 'OperationDefinition',
+      ...options,
+    };
+  }
+
+  buildAst(kind, options) {
+    return {
+      kind,
+      ...options,
+    };
+  }
+
+  buildName(value) {
+    return {
+      kind: 'Name',
+      value,
+    };
+  }
+
+  generateQuery = currentField => {
     // this doesn't work inside a search
     if (this.state.navStack.find(({ search }) => search)) {
       return;
     }
 
-    this.state.navStack.forEach(nav => {
+    // dont push the same
+    if (
+      this.currentFields.findIndex(
+        field => field.name === currentField.name,
+      ) === -1
+    ) {
+      this.currentFields.push(currentField);
+    }
+
+    // flat fields
+    const fields = [];
+    // insideArg is used to detect when we navigate throw args
+    let insideArg = false;
+
+    for (let i = 2; i < this.state.navStack.length; i++) {
+      const nav = this.state.navStack[i];
+      if (nav.arg) {
+        insideArg = true;
+      }
       if (nav.field) {
-        str = str.replace(
-          '%s',
-          `${nav.field.name ? nav.field.name : nav.field}{%s}`,
-        );
+        fields.unshift(this.state.navStack[i]);
+      }
+    }
+
+    fields.unshift({ field: this.currentFields });
+
+    let curSelectionSet = null;
+    let curField = null;
+
+    let curArg = null;
+
+    fields.forEach(nav => {
+      if (nav.arg) {
+        curArg = this.buildAst('Argument', {
+          name: this.buildName(nav.arg),
+          value: curField
+            ? this.buildAst('ObjectValue', {
+                fields: [curField],
+              })
+            : this.buildAst('NullValue'),
+        });
+        insideArg = false;
+      }
+
+      let navFields = Array.isArray(nav.field) ? nav.field : [nav.field];
+      if (!insideArg) {
+        let astFields = [];
+        navFields.forEach(navField => {
+          if (navField.args.length && curArg === null) {
+            curArg = [];
+            navField.args.forEach(arg => {
+              curArg.push(
+                this.buildAst('Argument', {
+                  name: this.buildName(arg.name),
+                  value: this.buildAst('NullValue'),
+                }),
+              );
+            });
+          }
+
+          astFields.push(
+            this.buildAst('Field', {
+              name: this.buildName(navField.name),
+              selectionSet: curSelectionSet, // set the previous one
+              arguments: curArg ? [curArg] : null,
+            }),
+          );
+
+          curArg = null; // clean current args
+        });
+
+        curSelectionSet = this.buildAst('SelectionSet', {
+          selections: astFields,
+        });
+      } else {
+        // inside arg there is  ObjectField instead of Field
+        let value = null;
+        if (curField) {
+          curField = this.buildAst('ObjectField', {
+            name: this.buildName(navFields[0].name),
+            value: this.buildAst('ObjectValue', {
+              fields: curField,
+            }),
+          });
+        } else {
+          // only one last level we set null value
+          // we also allow to select multiple fields
+          value = this.buildAst('NullValue');
+
+          curField = navFields.map(navField => {
+            return this.buildAst('ObjectField', {
+              name: this.buildName(navField.name),
+              value,
+            });
+          });
+        }
       }
     });
 
-    if (str) {
-      const args = field.args.filter(arg => arg.type instanceof GraphQLNonNull);
+    const ast = this.buildDocument([
+      this.buildOperationDefinition({
+        operation: this.state.navStack[1].field,
+        selectionSet: curSelectionSet,
+      }),
+    ]);
 
-      if (args.length) {
-        const stringArgs = args
-          .map(arg => {
-            return `${arg.name}: null`;
-          })
-          .join(',');
-
-        str = str.replace('%s', `${field.name}(${stringArgs})`);
-      } else {
-        str = str.replace('%s', `${field.name}`);
-      }
-
-      this.props.onGenerateQuery(str);
-    }
+    this.props.onGenerateQuery(print(ast));
   };
 
   handleSearch = value => {
