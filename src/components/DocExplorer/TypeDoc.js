@@ -20,6 +20,7 @@ import Argument from './Argument';
 import MarkdownContent from './MarkdownContent';
 import TypeLink from './TypeLink';
 import DefaultValue from './DefaultValue';
+import { TestButton } from '../TestButton';
 
 export default class TypeDoc extends React.Component {
   static propTypes = {
@@ -207,12 +208,11 @@ function Field({ type, field, onClickType, onClickField, onClickTest, hover }) {
       <TypeLink field={field} type={field.type} onClick={onClickType} />
 
       {hover &&
-        <button
-          className="test-button"
-          title="Try it out"
-          onClick={() => onClickTest(field)}>
-          {'{...}'}
-        </button>}
+        <TestButton
+          onClickTest={() => onClickTest(field)}
+          onClickAllParameters={() => onClickTest(field, null, true)}
+          onClickNewQuery={() => onClickTest(field, null, false, true)}
+        />}
 
       <DefaultValue field={field} />
       {field.description &&

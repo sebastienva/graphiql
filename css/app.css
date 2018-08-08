@@ -603,20 +603,29 @@ div.CodeMirror-lint-tooltip > * + * {
   color: #CA9800;
 }
 
-.test-button {
-  float: right;
+.test-button-container {
+  position: absolute;
+  right: 4px;
 }
 
 .test-button {
   background-color: #e7e7e7;
   color: black;
   border: none;
-  position: absolute;
-  right: 4px;
-  border-radius: 4px;
   outline: none;
+  line-height: 20px;
   border: 1px solid transparent;
   cursor: pointer;
+}
+
+.test-button-container button:first-child {
+  border-top-left-radius: 4px;
+  border-bottom-left-radius: 4px;
+}
+
+.test-button-container button:last-child {
+  border-top-right-radius: 4px;
+  border-bottom-right-radius: 4px;
 }
 
 .test-button:hover {
@@ -625,4 +634,22 @@ div.CodeMirror-lint-tooltip > * + * {
 
 .test-button:active {
   background-color: #cccccc;
+}
+
+.test-button-options {
+  position: absolute;
+  right: 4px;
+  background-color: #e7e7e7;
+  margin-top: 27px;
+  list-style: none;
+  padding: 0;
+}
+
+.test-button-options li {
+  padding: 7px;
+  cursor: pointer;
+}
+
+.test-button-options li:hover {
+  background-color: #ccc;
 }

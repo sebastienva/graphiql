@@ -48,6 +48,7 @@ export class DocExplorer extends React.Component {
 
     this.state = { navStack: [initialNav] };
     this.currentFields = [];
+    this.selectedArgs = [];
   }
 
   shouldComponentUpdate(nextProps, nextState) {
@@ -104,7 +105,11 @@ export class DocExplorer extends React.Component {
       );
     } else {
       content = (
-        <FieldDoc field={navItem.def} onClickType={this.handleClickType} />
+        <FieldDoc
+          field={navItem.def}
+          onClickType={this.handleClickType}
+          onClickTest={this.handleClickTest}
+        />
       );
     }
 
@@ -190,6 +195,7 @@ export class DocExplorer extends React.Component {
   }
 
   handleNavBackClick = () => {
+    this.currentFields = [];
     if (this.state.navStack.length > 1) {
       this.setState({ navStack: this.state.navStack.slice(0, -1) });
     }
@@ -201,10 +207,6 @@ export class DocExplorer extends React.Component {
 
   handleClickField = field => {
     this.showDoc(field, field);
-  };
-
-  handleClickTest = field => {
-    this.generateQuery(field);
   };
 
   buildDocument(definitions) {
@@ -235,10 +237,20 @@ export class DocExplorer extends React.Component {
     };
   }
 
-  generateQuery = currentField => {
+  handleClickTest = (
+    currentField,
+    arg,
+    allParameters = false,
+    newQuery = false,
+  ) => {
     // this doesn't work inside a search
     if (this.state.navStack.find(({ search }) => search)) {
       return;
+    }
+
+    if (newQuery) {
+      this.currentFields = [];
+      this.currentQueryName = null;
     }
 
     // dont push the same
@@ -265,7 +277,11 @@ export class DocExplorer extends React.Component {
       }
     }
 
-    fields.unshift({ field: this.currentFields });
+    if (!arg) {
+      fields.unshift({ field: this.currentFields });
+    } else {
+      this.selectedArgs.push(arg);
+    }
 
     let curSelectionSet = null;
     let curField = null;
@@ -285,19 +301,25 @@ export class DocExplorer extends React.Component {
         insideArg = false;
       }
 
-      let navFields = Array.isArray(nav.field) ? nav.field : [nav.field];
+      const navFields = Array.isArray(nav.field) ? nav.field : [nav.field];
       if (!insideArg) {
-        let astFields = [];
+        const astFields = [];
         navFields.forEach(navField => {
-          if (navField.args.length && curArg === null) {
+          if (navField.args && navField.args.length && curArg === null) {
             curArg = [];
             navField.args.forEach(arg => {
-              curArg.push(
-                this.buildAst('Argument', {
-                  name: this.buildName(arg.name),
-                  value: this.buildAst('NullValue'),
-                }),
-              );
+              if (
+                allParameters ||
+                arg.type instanceof GraphQLNonNull ||
+                this.selectedArgs.indexOf(arg.name) !== -1
+              ) {
+                curArg.push(
+                  this.buildAst('Argument', {
+                    name: this.buildName(arg.name),
+                    value: this.buildAst('NullValue'),
+                  }),
+                );
+              }
             });
           }
 
@@ -340,14 +362,22 @@ export class DocExplorer extends React.Component {
       }
     });
 
+    if (!this.currentQueryName) {
+      this.currentQueryName =
+        currentField.name +
+        '_' +
+        Math.random().toString(36).replace(/[^a-z]+/g, '');
+    }
+
     const ast = this.buildDocument([
       this.buildOperationDefinition({
         operation: this.state.navStack[1].field,
+        name: this.buildName(this.currentQueryName),
         selectionSet: curSelectionSet,
       }),
     ]);
 
-    this.props.onGenerateQuery(print(ast));
+    this.props.onGenerateQuery(ast);
   };
 
   handleSearch = value => {

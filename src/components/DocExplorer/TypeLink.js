@@ -17,7 +17,9 @@ export default class TypeLink extends React.Component {
   };
 
   shouldComponentUpdate(nextProps) {
-    return this.props.type !== nextProps.type;
+    return (
+      this.props.type !== nextProps.type || this.props.field !== nextProps.field
+    );
   }
 
   render() {
@@ -32,10 +34,12 @@ export default class TypeLink extends React.Component {
 
 function renderType(type, onClick, field, arg) {
   if (type instanceof GraphQLNonNull) {
-    return <span>{renderType(type.ofType, onClick)}{'!'}</span>;
+    return <span>{renderType(type.ofType, onClick, field, arg)}{'!'}</span>;
   }
   if (type instanceof GraphQLList) {
-    return <span>{'['}{renderType(type.ofType, onClick)}{']'}</span>;
+    return (
+      <span>{'['}{renderType(type.ofType, onClick, field, arg)}{']'}</span>
+    );
   }
   return (
     <a

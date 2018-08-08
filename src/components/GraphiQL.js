@@ -388,13 +388,7 @@ export class GraphiQL extends React.Component {
             ref={c => {
               this.docExplorerComponent = c;
             }}
-            onGenerateQuery={query => {
-              this.setState({ query }, () => {
-                this.setState({ query: this.autoCompleteLeafs() }, () => {
-                  this.handlePrettifyQuery();
-                });
-              });
-            }}
+            onGenerateQuery={this.handleGenerateQuery}
             schema={this.state.schema}>
             <div className="docExplorerHide" onClick={this.handleToggleDocs}>
               {'\u2715'}
@@ -953,6 +947,37 @@ export class GraphiQL extends React.Component {
 
     document.addEventListener('mousemove', onMouseMove);
     document.addEventListener('mouseup', onMouseUp);
+  };
+
+  handleGenerateQuery = query => {
+    let newQuery = null;
+
+    try {
+      const oldQuery = parse(this.state.query);
+      query.definitions.forEach(definition => {
+        const defName = definition.name.value;
+
+        const present = oldQuery.definitions.findIndex(
+          a => a.name.value === defName,
+        );
+
+        if (present !== -1) {
+          oldQuery.definitions[present] = definition;
+        } else {
+          oldQuery.definitions.push(definition);
+        }
+      });
+
+      newQuery = oldQuery;
+    } catch (e) {
+      newQuery = query;
+    }
+
+    this.setState({ query: print(newQuery) }, () => {
+      this.setState({ query: this.autoCompleteLeafs() }, () => {
+        this.handlePrettifyQuery();
+      });
+    });
   };
 }
 
