@@ -606,6 +606,7 @@ div.CodeMirror-lint-tooltip > * + * {
 .test-button-container {
   position: absolute;
   right: 4px;
+  margin-top: -20px;
 }
 
 .test-button {
