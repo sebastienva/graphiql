@@ -641,7 +641,7 @@ div.CodeMirror-lint-tooltip > * + * {
   position: absolute;
   right: 4px;
   background-color: #e7e7e7;
-  margin-top: 27px;
+  margin-top: 6px;
   list-style: none;
   padding: 0;
 }
