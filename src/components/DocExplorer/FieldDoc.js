@@ -17,6 +17,7 @@ export default class FieldDoc extends React.Component {
   static propTypes = {
     field: PropTypes.object,
     onClickType: PropTypes.func,
+    onClickTest: PropTypes.func,
   };
 
   shouldComponentUpdate(nextProps) {
@@ -37,6 +38,9 @@ export default class FieldDoc extends React.Component {
             <div key={arg.name} className="doc-category-item">
               <div>
                 <Argument arg={arg} onClickType={this.props.onClickType} />
+                {/*<button onClick={() => this.props.onClickTest(arg, arg.name)}>
+                    Add
+                  </button>*/}
               </div>
               <MarkdownContent
                 className="doc-value-description"

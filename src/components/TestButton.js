@@ -20,6 +20,9 @@ export class TestButton extends React.Component {
     onClickTest: PropTypes.func,
     onClickAllParameters: PropTypes.func,
     onClickNewQuery: PropTypes.func,
+    onClickAppendQuery: PropTypes.func,
+    allowAppend: PropTypes.bool,
+    allowAllArgs: PropTypes.bool,
   };
 
   constructor(props) {
@@ -29,11 +32,11 @@ export class TestButton extends React.Component {
 
   render() {
     return (
-      <div>
+      <div onKeyPress={this.handleKeyPressed}>
         <div className="test-button-container">
 
           <button className="test-button" onClick={this.props.onClickTest}>
-            {'+'}
+            {'{...}'}
           </button>
           <button
             className="test-button"
@@ -45,11 +48,28 @@ export class TestButton extends React.Component {
         </div>
         {this.state.optionsOpen &&
           <ul className="test-button-options">
-            <li onClick={this.props.onClickAllParameters}>
-              {'Add all parameters'}
-            </li>
-            <li onClick={this.props.onClickNewQuery}>
-              {'Add new query'}
+            {this.props.allowAppend &&
+              <li
+                onClick={() => {
+                  this.props.onClickAppendQuery();
+                  this.setState({ optionsOpen: false });
+                }}>
+                {'Append to current query'}
+              </li>}
+            {this.props.allowAllArgs &&
+              <li
+                onClick={() => {
+                  this.props.onClickAllParameters();
+                  this.setState({ optionsOpen: false });
+                }}>
+                {'Add all parameters'}
+              </li>}
+            <li
+              onClick={() => {
+                this.props.onClickNewQuery();
+                this.setState({ optionsOpen: false });
+              }}>
+              {'Add to new query'}
             </li>
           </ul>}
       </div>

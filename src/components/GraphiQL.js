@@ -693,6 +693,7 @@ export class GraphiQL extends React.Component {
 
   handlePrettifyQuery = () => {
     const editor = this.getQueryEditor();
+    console.log(parse(editor.getValue()));
     editor.setValue(print(parse(editor.getValue())));
   };
 
@@ -950,7 +951,7 @@ export class GraphiQL extends React.Component {
   };
 
   handleGenerateQuery = query => {
-    let newQuery = null;
+    let nextQuery = null;
 
     try {
       const oldQuery = parse(this.state.query);
@@ -968,12 +969,12 @@ export class GraphiQL extends React.Component {
         }
       });
 
-      newQuery = oldQuery;
+      nextQuery = oldQuery;
     } catch (e) {
-      newQuery = query;
+      nextQuery = query;
     }
 
-    this.setState({ query: print(newQuery) }, () => {
+    this.setState({ query: print(nextQuery) }, () => {
       this.setState({ query: this.autoCompleteLeafs() }, () => {
         this.handlePrettifyQuery();
       });

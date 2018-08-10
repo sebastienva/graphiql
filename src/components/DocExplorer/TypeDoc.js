@@ -183,7 +183,7 @@ export default class TypeDoc extends React.Component {
   handleShowDeprecated = () => this.setState({ showDeprecated: true });
 }
 
-function Field({ type, field, onClickType, onClickField, onClickTest, hover }) {
+function Field({ field, onClickType, onClickField, onClickTest, hover }) {
   return (
     <div className="doc-category-item">
       <a className="field-name" onClick={event => onClickField(field, event)}>
@@ -209,9 +209,13 @@ function Field({ type, field, onClickType, onClickField, onClickTest, hover }) {
 
       {hover &&
         <TestButton
+          allowAppend
+          allowAllArgs={field.args && field.args.length > 0}
           onClickTest={() => onClickTest(field)}
           onClickAllParameters={() => onClickTest(field, null, true)}
           onClickNewQuery={() => onClickTest(field, null, false, true)}
+          onClickAppendQuery={() =>
+            onClickTest(field, null, false, false, true)}
         />}
 
       <DefaultValue field={field} />
@@ -234,6 +238,8 @@ Field.propTypes = {
   field: PropTypes.object,
   onClickType: PropTypes.func,
   onClickField: PropTypes.func,
+  hover: PropTypes.bool,
+  onClickTest: PropTypes.func,
 };
 
 function EnumValue({ value }) {

@@ -8,7 +8,14 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import { GraphQLSchema, isType, GraphQLNonNull, print } from 'graphql';
+import {
+  GraphQLSchema,
+  isType,
+  getNamedType,
+  GraphQLNonNull,
+  GraphQLInputObjectType,
+  print,
+} from 'graphql';
 
 import FieldDoc from './DocExplorer/FieldDoc';
 import SchemaDoc from './DocExplorer/SchemaDoc';
@@ -195,6 +202,7 @@ export class DocExplorer extends React.Component {
   }
 
   handleNavBackClick = () => {
+    // todo : should look level and reset if we try to add to different level instead of erase
     this.currentFields = [];
     if (this.state.navStack.length > 1) {
       this.setState({ navStack: this.state.navStack.slice(0, -1) });
@@ -237,11 +245,35 @@ export class DocExplorer extends React.Component {
     };
   }
 
+  getArgsFromType(type, allParameters) {
+    const realType = getNamedType(type);
+    if (realType instanceof GraphQLInputObjectType) {
+      const typeFields = realType.getFields();
+
+      const argFields = Object.keys(typeFields).map(typeFieldName => {
+        const argField = typeFields[typeFieldName];
+        if (allParameters || argField.type instanceof GraphQLNonNull) {
+          return this.buildAst('ObjectField', {
+            name: this.buildName(typeFieldName),
+            value: this.buildAst('NullValue'),
+          });
+        }
+      });
+
+      return this.buildAst('ObjectValue', {
+        fields: argFields,
+      });
+    }
+
+    return this.buildAst('NullValue');
+  }
+
   handleClickTest = (
     currentField,
     arg,
     allParameters = false,
     newQuery = false,
+    appendQuery = false,
   ) => {
     // this doesn't work inside a search
     if (this.state.navStack.find(({ search }) => search)) {
@@ -251,6 +283,11 @@ export class DocExplorer extends React.Component {
     if (newQuery) {
       this.currentFields = [];
       this.currentQueryName = null;
+    }
+
+    // dont keep selected fields
+    if (!appendQuery) {
+      this.currentFields = [];
     }
 
     // dont push the same
@@ -313,10 +350,12 @@ export class DocExplorer extends React.Component {
                 arg.type instanceof GraphQLNonNull ||
                 this.selectedArgs.indexOf(arg.name) !== -1
               ) {
+                const value = this.getArgsFromType(arg.type, allParameters);
+
                 curArg.push(
                   this.buildAst('Argument', {
                     name: this.buildName(arg.name),
-                    value: this.buildAst('NullValue'),
+                    value,
                   }),
                 );
               }
@@ -340,6 +379,7 @@ export class DocExplorer extends React.Component {
       } else {
         // inside arg there is  ObjectField instead of Field
         let value = null;
+
         if (curField) {
           curField = this.buildAst('ObjectField', {
             name: this.buildName(navFields[0].name),
@@ -353,6 +393,10 @@ export class DocExplorer extends React.Component {
           value = this.buildAst('NullValue');
 
           curField = navFields.map(navField => {
+            if (navField.type instanceof GraphQLInputObjectType) {
+              value = this.getArgsFromType(navField.type);
+            }
+
             return this.buildAst('ObjectField', {
               name: this.buildName(navField.name),
               value,
@@ -377,7 +421,7 @@ export class DocExplorer extends React.Component {
       }),
     ]);
 
-    this.props.onGenerateQuery(ast);
+    this.props.onGenerateQuery(ast, newQuery);
   };
 
   handleSearch = value => {
