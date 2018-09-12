@@ -388,6 +388,7 @@ export class GraphiQL extends React.Component {
             ref={c => {
               this.docExplorerComponent = c;
             }}
+            currentQuery={this.state.query}
             onGenerateQuery={this.handleGenerateQuery}
             schema={this.state.schema}>
             <div className="docExplorerHide" onClick={this.handleToggleDocs}>
@@ -693,7 +694,6 @@ export class GraphiQL extends React.Component {
 
   handlePrettifyQuery = () => {
     const editor = this.getQueryEditor();
-    console.log(parse(editor.getValue()));
     editor.setValue(print(parse(editor.getValue())));
   };
 

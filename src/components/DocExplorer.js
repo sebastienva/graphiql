@@ -14,7 +14,7 @@ import {
   getNamedType,
   GraphQLNonNull,
   GraphQLInputObjectType,
-  print,
+  parse,
 } from 'graphql';
 
 import FieldDoc from './DocExplorer/FieldDoc';
@@ -271,8 +271,8 @@ export class DocExplorer extends React.Component {
   handleClickTest = (
     currentField,
     arg,
-    allParameters = false,
-    newQuery = false,
+    allParameters = true,
+    newQuery = true,
     appendQuery = false,
   ) => {
     // this doesn't work inside a search
@@ -407,10 +407,14 @@ export class DocExplorer extends React.Component {
     });
 
     if (!this.currentQueryName) {
-      this.currentQueryName =
-        currentField.name +
-        '_' +
-        Math.random().toString(36).replace(/[^a-z]+/g, '');
+      let queryNumber;
+      try {
+        queryNumber = parse(this.props.currentQuery).definitions.length + 1;
+      } catch (e) {
+        queryNumber = 1;
+      }
+
+      this.currentQueryName = currentField.name + '_' + queryNumber;
     }
 
     const ast = this.buildDocument([
