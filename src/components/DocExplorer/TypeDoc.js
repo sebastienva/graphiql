@@ -213,7 +213,7 @@ function Field({ field, onClickType, onClickField, onClickTest, hover }) {
           allowAllArgs={field.args && field.args.length > 0}
           onClickTest={() => onClickTest(field)}
           onClickAllParameters={() => onClickTest(field, null, true)}
-          onClickNewQuery={() => onClickTest(field, null, false, true)}
+          onClickNewQuery={() => onClickTest(field, null, true, true)}
           onClickAppendQuery={() =>
             onClickTest(field, null, false, false, true)}
         />}

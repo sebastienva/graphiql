@@ -34,7 +34,6 @@ export class TestButton extends React.Component {
     return (
       <div onKeyPress={this.handleKeyPressed}>
         <div className="test-button-container">
-
           <button className="test-button" onClick={this.props.onClickTest}>
             {'{...}'}
           </button>
@@ -44,32 +43,15 @@ export class TestButton extends React.Component {
               this.setState({ optionsOpen: !this.state.optionsOpen })}>
             {'▾'}
           </button>
-
         </div>
         {this.state.optionsOpen &&
           <ul className="test-button-options">
-            {this.props.allowAppend &&
-              <li
-                onClick={() => {
-                  this.props.onClickAppendQuery();
-                  this.setState({ optionsOpen: false });
-                }}>
-                {'Append to current query'}
-              </li>}
-            {this.props.allowAllArgs &&
-              <li
-                onClick={() => {
-                  this.props.onClickAllParameters();
-                  this.setState({ optionsOpen: false });
-                }}>
-                {'Add all parameters'}
-              </li>}
             <li
               onClick={() => {
                 this.props.onClickNewQuery();
                 this.setState({ optionsOpen: false });
               }}>
-              {'Add to new query'}
+              {'(...) with all parameters'}
             </li>
           </ul>}
       </div>

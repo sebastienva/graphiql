@@ -271,7 +271,7 @@ export class DocExplorer extends React.Component {
   handleClickTest = (
     currentField,
     arg,
-    allParameters = true,
+    allParameters = false,
     newQuery = true,
     appendQuery = false,
   ) => {
